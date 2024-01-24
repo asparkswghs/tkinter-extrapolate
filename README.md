@@ -9,12 +9,12 @@ Depends:
 - tkinter
 
 
+Unix-likes:
+```bash
+./main.py
+```
+
 Windows:
 ```powershell
 python main.py
-```
-
-Others:
-```bash
-./main.py
 ```
