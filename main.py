@@ -13,6 +13,7 @@ def validate(P):
 
 def callback_draw():
     """ Clears and draws to the Canvas """
+
     canvas.delete('all')
     draw.graph(canvas, 10, 10) #XXX
 
@@ -21,11 +22,13 @@ window = tk.Tk()
 window.geometry("600x400")
 window.minsize(600, 400)
 window.title("Data Extrapolator")
+window.grid_rowconfigure(5, weight=1)
+window.grid_columnconfigure(0, weight=1)
 
 call_validate = window.register(validate) # Register Validation Function
 
 # Entries
-entries = {"a": None, "b": None, "c": None}
+entries = {"a": None, "b": None}
 for i in entries:
     entries[i] = {
         "x": tk.Entry(window,  validate='all', validatecommand=(call_validate, '%P')),
@@ -33,7 +36,7 @@ for i in entries:
     }
 
 # Labels
-label_instr = tk.Label(window, text='Data Extrapolator\nExtrapolates data based on  the 3 points provided.')
+label_instr = tk.Label(window, text='Data Extrapolator\nExtrapolates data based on the 2 points provided.')
 
 for i in entries:
     entries[i]["label"] = tk.Label(window, text=f'{i} = ')
@@ -48,23 +51,23 @@ button = tk.Button(window, text='Extrapolate', command=callback_draw)
 canvas = tk.Canvas(window)
 
 # Grid
-label_instr.grid(column=0, row=0, columnspan=5)
+label_instr.grid(column=1, row=0, columnspan=5)
 
 # 0     | 1    | 2     | 3   | 4     | 5
 # label | "("" | entry | "," | entry | ")"
 row = 1
 for i in entries:
-    entries[i]["label"].grid(column=0, row=row)
-    entries[i]["("].grid(column=1, row=row)
-    entries[i]["x"].grid(column=2, row=row)
-    entries[i][","].grid(column=3, row=row)
-    entries[i]["y"].grid(column=4, row=row)
-    entries[i][")"].grid(column=5, row=row)
+    entries[i]["label"].grid(column=1, row=row)
+    entries[i]["("].grid(column=2, row=row)
+    entries[i]["x"].grid(column=3, row=row)
+    entries[i][","].grid(column=4, row=row)
+    entries[i]["y"].grid(column=5, row=row)
+    entries[i][")"].grid(column=6, row=row)
     row += 1
 
-button.grid(column=1, row=4, columnspan=4)
+button.grid(column=2, row=4, columnspan=4)
 
-canvas.grid(column=0, row=5, columnspan=100, sticky='SW')
+canvas.grid(column=0, row=5, columnspan=100, sticky='nsew')
 
 # Present Window
 draw.graph(canvas, 10, 10)
