@@ -13,14 +13,37 @@ def validate(P):
 
 def callback_draw():
     """ Clears and draws to the Canvas """
+    digit = lambda x: x if str.isdigit(x) else 0
+    a_x = int(digit(entries["a"]["x"].get()))
+    a_y = int(digit(entries["a"]["y"].get()))
+    b_x = int(digit(entries["b"]["x"].get()))
+    b_y = int(digit(entries["b"]["y"].get()))
+
+    if a_x == 0 and a_y == 0 and b_x == 0 and b_y == 0:
+        return
+
+    addscale = lambda x: x+50 if (x+50)<=400 else x # Adds extra space to graph for extrapolated data
+
+    max_x = addscale(max([a_x, b_x]))
+    max_y = addscale(max([a_y, b_y]))
 
     canvas.delete('all')
-    draw.graph(canvas, 10, 10) #XXX
+    unit = draw.graph(canvas, max_x, max_y)
+    draw.extrapolate(
+        canvas,
+        unit,
+        {
+            "a": (a_x, a_y,),
+            "b": (b_x, b_y,),
+        },
+        max_x,
+        max_y
+    )
 
 # Window
 window = tk.Tk()
-window.geometry("600x400")
-window.minsize(600, 400)
+window.geometry("900x600")
+window.minsize(900, 600)
 window.title("Data Extrapolator")
 window.grid_rowconfigure(5, weight=1)
 window.grid_columnconfigure(0, weight=1)
