@@ -41,7 +41,7 @@ def graph(canvas: tkinter.Canvas, max_x: int, max_y: int) -> Dict[float, float]:
     for i in units_y:
         if i >= 0 and max_y - i >= 0:
             h = i*unit["y"] # Unit for Height, offset to show labels properly
-            canvas.create_text(pad(5), h, text=f'{max_y - i}')
+            canvas.create_text(pad(0), h, text=f'{max_y - i}')
             canvas.create_line(pad(10), h, pad(15), h)
     canvas.create_line(pad(start), 0, pad(start), max_y*unit["y"])
 
@@ -61,11 +61,11 @@ def extrapolate(canvas: tkinter.Canvas, unit: dict, points: dict, max_x: int, ma
     global start
     base_x = padding + start
     base_y = max_y * unit["y"]
-    scale_x = lambda x: x*unit["x"]
-    scale_y = lambda x: x*unit["y"]
+    scale_x = lambda x: base_x+(x*unit["x"]) # Scale coordinates to units on canvas
+    scale_y = lambda x: base_y-(x*unit["y"])
     points_new = {
-        "a": ( (base_x+scale_x(points["a"][0])), base_y-scale_y(points["a"][1]) ), # point a: (x, y)
-        "b": ( (base_x+scale_x(points["b"][0])), base_y-scale_y(points["b"][1]) ), # point b: (x, y)
+        "a": ( (scale_x(points["a"][0])), scale_y(points["a"][1]) ), # point a: (x, y)
+        "b": ( (scale_x(points["b"][0])), scale_y(points["b"][1]) ), # point b: (x, y)
     }
     print(points_new) #TODO
     canvas.create_line(*points_new["a"], *points_new["b"], width=3) # Draws user-provided points
@@ -73,9 +73,15 @@ def extrapolate(canvas: tkinter.Canvas, unit: dict, points: dict, max_x: int, ma
     m = (points["a"][1] - points["b"][1]) / (points["a"][0] - points["b"][0]) # (rise, run)
     b =  points["a"][1] - (m*points["a"][0]) # b = y - mx
     y = lambda x: (m*x) + b
+    if m < 0: # Corrections, because the drawn line is predictably off
+        corr_x = -1*unit["x"]
+        corr_y = -1*unit["y"]
+    else:
+        corr_x = unit["x"]
+        corr_y = unit["y"]
     points_extr = {
         "a": points_new["a"], # this stays the same, no need to recalculate
-        "b": ( scale_x(max_x), base_y-scale_y(y(max_x)) ), # Calculate point of farthest possible X on graph
+        "b": ( scale_x(max_x)+corr_x, base_y-scale_y(y(max_x))+corr_y ), # Calculate point of farthest possible X on graph
     }
     print(f'ext b: {points_extr["b"]}')
     canvas.create_line(*points_extr["a"], *points_extr["b"]) # Draws new projected points
