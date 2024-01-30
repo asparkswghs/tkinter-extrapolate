@@ -4,12 +4,14 @@ from typing import Dict
 
 padding = 20
 start = 12.5
+max_points = 20
 
 def graph(canvas: tkinter.Canvas, max_x: int, max_y: int) -> Dict[float, float]:
     """ Draw an all-positive line graph on the given `canvas`, given max possible x and y values.
     Returns int: width of 1 unit on graph """
     global padding
     global start
+    global max_points
     canvas.update()
     width = canvas.winfo_width() - padding
     height = canvas.winfo_height() - padding
@@ -21,7 +23,7 @@ def graph(canvas: tkinter.Canvas, max_x: int, max_y: int) -> Dict[float, float]:
     pad = lambda x: x + padding
 
     # Step & Units
-    if max_x > 20 or max_y > 20:
+    if max_x > max_points or max_y > max_points:
         max_all = max([max_x, max_y])
         units = range(0, max_all+1)
         step = 1
@@ -66,6 +68,14 @@ def extrapolate(canvas: tkinter.Canvas, unit: dict, points: dict, max_x: int, ma
         "b": ( (base_x+scale_x(points["b"][0])), base_y-scale_y(points["b"][1]) ), # point b: (x, y)
     }
     print(points_new) #TODO
-    canvas.create_line(*points_new["a"], *points_new["b"], width=3)
-    ext_const = 1000000
-    canvas.create_line(*points_new["a"], points_new["b"][0]*(ext_const*unit["x"]), points_new["b"][1]*(ext_const*unit["y"]))
+    canvas.create_line(*points_new["a"], *points_new["b"], width=3) # Draws user-provided points
+    # y = mx + b
+    m = (points["a"][1] - points["b"][1]) / (points["a"][0] - points["b"][0]) # (rise, run)
+    b =  points["a"][1] - (m*points["a"][0]) # b = y - mx
+    y = lambda x: (m*x) + b
+    points_extr = {
+        "a": points_new["a"], # this stays the same, no need to recalculate
+        "b": ( scale_x(max_x), base_y-scale_y(y(max_x)) ), # Calculate point of farthest possible X on graph
+    }
+    print(f'ext b: {points_extr["b"]}')
+    canvas.create_line(*points_extr["a"], *points_extr["b"]) # Draws new projected points
