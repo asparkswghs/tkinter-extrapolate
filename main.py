@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 # Copyright (c) 2024 Austen Sparks
 #   Subject to the terms of the MIT License, see LICENSE for details.
+import re
 import tkinter as tk
 
 from libs import draw
+
+# Init Values
+a_x, a_y, b_x, b_y = 0, 0, 0, 0
 
 # Functions
 def validate(P) -> bool:
@@ -13,15 +17,23 @@ def validate(P) -> bool:
     else:
         return False
 
-def callback_draw() -> None:
-    """ Clears and draws to the Canvas """
+def refresh_coords() -> None:
+    global a_x, a_y, b_x, b_y
     digit = lambda x: x if str.isdigit(x) else 0 # Sets values to 0 if they aren't an int; e.g. if it's empty
     a_x = int(digit(entries["a"]["x"].get()))
     a_y = int(digit(entries["a"]["y"].get()))
     b_x = int(digit(entries["b"]["x"].get()))
     b_y = int(digit(entries["b"]["y"].get()))
 
-    if a_x == 0 and a_y == 0 and b_x == 0 and b_y == 0: # If all values are 0, we don't graph anything
+def callback_draw(*args, new=False) -> None:
+    """ Clears and draws to the Canvas """
+    if new:
+        refresh_coords()
+    global a_x, a_y, b_x, b_y
+
+    if a_x == 0 and a_y == 0 and b_x == 0 and b_y == 0: # If all values are 0 (i.e. empty) just reset the canvas
+        canvas.delete('all')
+        draw.graph(canvas, 10, 10)
         return
 
     addscale = lambda x: x+50 if (x+50)<=400 else x # Adds extra space to graph for extrapolated data
@@ -42,11 +54,17 @@ def callback_draw() -> None:
         max_y
     )
 
+def callback_button() -> None:
+    """ Refreshes values and draws graph, callback for button """
+    refresh_coords()
+    callback_draw()
+
 # Window Properties
 window = tk.Tk()
-window.geometry("900x600")
+window.geometry("901x601") # See XXX near EOF
 window.minsize(900, 600)
 window.title("Data Extrapolator")
+window.bind('<Configure>', callback_draw)
 window.grid_rowconfigure(5, weight=1)    # Ensure row/column for canvas can expand to fill window
 window.grid_columnconfigure(0, weight=1) # 
 
@@ -70,7 +88,7 @@ for i in entries: # Create coordinate labels
     entries[i][")"] = tk.Label(window, text=')')
 
 # Buttons
-button = tk.Button(window, text='Extrapolate', command=callback_draw)
+button = tk.Button(window, text='Extrapolate', command=callback_button)
 
 # Canvas
 canvas = tk.Canvas(window)
@@ -97,4 +115,6 @@ canvas.grid(column=0, row=5, columnspan=100, sticky='nsew') # Add canvas, being 
 
 # Present Window
 draw.graph(canvas, 10, 10)
+window.update()
+window.geometry("900x600") # XXX: Workaround for a bug where labels and buttons are not visible until the window is resized.
 window.mainloop()
