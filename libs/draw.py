@@ -1,4 +1,6 @@
-# Functions for Drawing complex items to the canvas
+""" Functions for Drawing complex items to the canvas """
+# Copyright (c) 2024 Austen Sparks
+#   Subject to the terms of the MIT License, see LICENSE for details.
 import tkinter
 from typing import Dict
 
@@ -68,7 +70,7 @@ def extrapolate(canvas: tkinter.Canvas, unit: dict, points: dict, max_x: int, ma
         "b": ( (scale_x(points["b"][0])), scale_y(points["b"][1]) ), # point b: (x, y)
     }
     print(points_new) #TODO
-    canvas.create_line(*points_new["a"], *points_new["b"], width=3) # Draws user-provided points
+    canvas.create_line(*points_new["a"], *points_new["b"], width=2) # Draws user-provided points
     # y = mx + b
     m = (points["a"][1] - points["b"][1]) / (points["a"][0] - points["b"][0]) # (rise, run)
     b =  points["a"][1] - (m*points["a"][0]) # b = y - mx
@@ -85,4 +87,4 @@ def extrapolate(canvas: tkinter.Canvas, unit: dict, points: dict, max_x: int, ma
         "b": ( scale_x(max_x)+corr_x, scale_y(y(max_x))+corr_y ), # Calculate point of farthest possible X on graph
     }
     print(f'ext b: {points_extr["b"]}') #TODO
-    canvas.create_line(*points_extr["a"], *points_extr["b"]) # Draws new projected points
+    canvas.create_line(*points_extr["a"], *points_extr["b"], dash=(6,3)) # Draws new projected points
