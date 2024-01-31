@@ -73,6 +73,7 @@ def extrapolate(canvas: tkinter.Canvas, unit: dict, points: dict, max_x: int, ma
     m = (points["a"][1] - points["b"][1]) / (points["a"][0] - points["b"][0]) # (rise, run)
     b =  points["a"][1] - (m*points["a"][0]) # b = y - mx
     y = lambda x: (m*x) + b
+    x = lambda y: (y - b) / m
     if m < 0: # Corrections, because the drawn line is predictably off
         corr_x = -1*unit["x"]
         corr_y = -1*unit["y"]
@@ -80,7 +81,7 @@ def extrapolate(canvas: tkinter.Canvas, unit: dict, points: dict, max_x: int, ma
         corr_x = unit["x"]
         corr_y = unit["y"]
     points_extr = {
-        "a": points_new["a"], # this stays the same, no need to recalculate
+        "a": ( scale_x(x(0)), scale_y(0) ), # this stays the same, no need to recalculate
         "b": ( scale_x(max_x)+corr_x, scale_y(y(max_x))+corr_y ), # Calculate point of farthest possible X on graph
     }
     print(f'ext b: {points_extr["b"]}') #TODO
