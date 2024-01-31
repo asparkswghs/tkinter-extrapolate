@@ -55,7 +55,7 @@ def graph(canvas: tkinter.Canvas, max_x: int, max_y: int) -> Dict[float, float]:
     
     return unit
 
-def extrapolate(canvas: tkinter.Canvas, unit: dict, points: dict, max_x: int, max_y: int):
+def extrapolate(canvas: tkinter.Canvas, unit: dict, points: dict, max_x: int, max_y: int) -> None:
     """ Draws line based on two points, with continued trajectory """
     global padding
     global start

@@ -4,14 +4,14 @@ import tkinter as tk
 from libs import draw
 
 # Functions
-def validate(P):
+def validate(P) -> bool:
     """ Validates Entry boxes, to only contain integers """
     if str.isdigit(P) or P == "":
         return True
     else:
         return False
 
-def callback_draw():
+def callback_draw() -> None:
     """ Clears and draws to the Canvas """
     digit = lambda x: x if str.isdigit(x) else 0
     a_x = int(digit(entries["a"]["x"].get()))
