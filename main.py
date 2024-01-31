@@ -8,6 +8,7 @@ from libs import draw
 
 # Init Values
 a_x, a_y, b_x, b_y = 0, 0, 0, 0
+winsize = (900, 600,)
 
 # Functions
 def validate(P) -> bool:
@@ -25,10 +26,17 @@ def refresh_coords() -> None:
     b_x = int(digit(entries["b"]["x"].get()))
     b_y = int(digit(entries["b"]["y"].get()))
 
-def callback_draw(*args, new=False) -> None:
+def callback_draw(*args, manual=False) -> None:
     """ Clears and draws to the Canvas """
-    if new:
+    global winsize
+    newsize = (window.winfo_width(), window.winfo_height(),)
+    if winsize != newsize: # Window has been resized, continue with draw
+        winsize = newsize
+    elif manual: # Was manually called, draw anyways
         refresh_coords()
+    else: # Was neither resized nor manually called, don't redraw.
+        return
+        
     global a_x, a_y, b_x, b_y
 
     if a_x == 0 and a_y == 0 and b_x == 0 and b_y == 0: # If all values are 0 (i.e. empty) just reset the canvas
@@ -57,12 +65,13 @@ def callback_draw(*args, new=False) -> None:
 def callback_button() -> None:
     """ Refreshes values and draws graph, callback for button """
     refresh_coords()
-    callback_draw()
+    callback_draw(manual=True)
+
 
 # Window Properties
 window = tk.Tk()
 window.geometry("901x601") # See XXX near EOF
-window.minsize(900, 600)
+window.minsize(600, 400)
 window.title("Data Extrapolator")
 window.bind('<Configure>', callback_draw)
 window.grid_rowconfigure(5, weight=1)    # Ensure row/column for canvas can expand to fill window

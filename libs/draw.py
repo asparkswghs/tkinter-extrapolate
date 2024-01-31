@@ -74,17 +74,14 @@ def extrapolate(canvas: tkinter.Canvas, unit: dict, points: dict, max_x: int, ma
         "b": ( (scale_x(points["b"][0])), scale_y(points["b"][1]) ), # point b: (x, y)
     }
     canvas.create_line(*points_new["a"], *points_new["b"], width=2) # Draws user-provided points
+    for i in points_new: # Draw labels for points
+        canvas.create_text(points_new[i][0], points_new[i][1]+10, text=i)
     # y = mx + b
     m = (points["a"][1] - points["b"][1]) / (points["a"][0] - points["b"][0]) # (rise, run)
     b =  points["a"][1] - (m*points["a"][0]) # b = y - mx
     y = lambda x: (m*x) + b
     x = lambda y: (y - b) / m
-    if m < 0: # Corrections, because the drawn line is predictably off
-        corr_x = -1*unit["x"] - start
-        corr_y = -1*unit["y"] - start
-    else:
-        corr_x = unit["x"] - start
-        corr_y = unit["y"] - start
+    corr_x = unit["x"] - start # Corrections, because the drawn line is predictably off
     if m == 0:
         points_extr = {
             "a": ( scale_x(0), scale_y(y(max_x)) ),
@@ -93,6 +90,6 @@ def extrapolate(canvas: tkinter.Canvas, unit: dict, points: dict, max_x: int, ma
     else:
         points_extr = {
             "a": ( scale_x(x(0)), scale_y(0) ), # this stays the same, no need to recalculate
-            "b": ( scale_x(max_x)+corr_x, scale_y(y(max_x))+corr_y ), # Calculate point of farthest possible X on graph
+            "b": ( scale_x(max_x)+corr_x, scale_y(y(max_x)) ), # Calculate point of farthest possible X on graph
         }
     canvas.create_line(*points_extr["a"], *points_extr["b"], dash=(3,1)) # Draws new projected points
